@@ -1,0 +1,38 @@
+[
+    {
+        "_id": "yusz3tyjk3dq4wqbnnxhzwzcfv",
+        "title": "change title",
+        "severity": 1,
+        "createdAt": 1678288054.9113314
+    },
+    {
+        "_id": "yzlv2hm1mv4pznjtujtcvjxg78",
+        "title": "bug0.4993563017010789",
+        "severity": 1,
+        "createdAt": 1678288054.9113314
+    },
+    {
+        "_id": "t9u16g6xjwd82wbfp3snsjwfg3",
+        "title": "bug0.2706966910464986",
+        "severity": 2,
+        "createdAt": 1678288054.9113314
+    },
+    {
+        "_id": "c3sgwastsd3rqvt5sannmsovw8",
+        "title": "new bug",
+        "severity": 3,
+        "createdAt": 1678288730.3709898
+    },
+    {
+        "_id": "mxiulz1gvh5q9xgkupdiwjtwj1",
+        "title": "new bug",
+        "severity": 3,
+        "createdAt": 1678288736.798269
+    },
+    {
+        "_id": "rmcwpdjizp4ky67sn5bzdv2bgo",
+        "title": "new bug",
+        "severity": 3,
+        "createdAt": 1678288784.2724466
+    }
+]
