@@ -1,23 +1,39 @@
-from util_service import make_id
 import json
 import time
-
-with open("./data/bug.json", "r") as f:
-    bugs = json.load(f)
-
-
-def query():
-    return bugs
+import aiofiles
+import random
 
 
-def get_by_id(bug_id):
+async def load_bugs():
+    async with aiofiles.open("./data/bug.json", "r") as f:
+        data = await f.read()
+        return json.loads(data)
+
+
+async def query():
+    return await load_bugs()
+
+
+async def get_by_id(bug_id):
+    bugs = await load_bugs()
     for bug in bugs:
         if bug["_id"] == bug_id:
             return bug
-    return None
+    raise ValueError(f"Bug with id {bug_id} not found")
 
 
-def update_bug(new_bug):
+async def remove_bug(bug_id):
+    bugs = await load_bugs()
+    for bug in bugs:
+        if bug["_id"] == bug_id:
+            bugs.remove(bug)
+            await save_bugs(bugs)
+            return bugs
+    raise ValueError(f"Bug with id {bug_id} not found")
+
+
+async def update_bug(new_bug):
+    bugs = await query()
     idx = -1
     for i, bug in enumerate(bugs):
         if bug["_id"] == new_bug["_id"]:
@@ -27,27 +43,21 @@ def update_bug(new_bug):
     if idx >= 0:
         bugs[idx] = new_bug
 
-    save_bugs()
+    save_bugs(bugs)
     return bugs
 
 
-def add_bug(title, severity):
+async def add_bug(title, severity):
     bug = create_bug(title, severity)
+    bugs = await query()
     bugs.append(bug)
-    save_bugs()
+    save_bugs(bugs)
     return bugs
 
 
-def remove_bug(bug_id):
-    bug = get_by_id(bug_id)
-    bugs.remove(bug)
-    save_bugs()
-    return bugs
-
-
-def save_bugs():
-    with open("./data/bug.json", "w") as outfile:
-        json.dump(bugs, outfile, indent=4)
+async def save_bugs(bugs):
+    async with aiofiles.open("./data/bug.json", "w") as f:
+        await f.write(json.dumps(bugs))
 
 
 def create_bug(title, severity):
@@ -57,6 +67,16 @@ def create_bug(title, severity):
         "severity": severity,
         "createdAt": time.time(),
     }
+
+
+def make_id():
+    alphabet = "abcdefghijklmnopqrstuvwxyz123456789"
+    str = ""
+    for i in range(26):
+        rand_idx = random.randint(0, len(alphabet) - 1)
+        str += alphabet[rand_idx]
+
+    return str
 
 
 Bug_Service = {

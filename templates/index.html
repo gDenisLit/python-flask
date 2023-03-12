@@ -8,8 +8,154 @@
     <title>Document</title>
 </head>
 
-<body>
+<body onload="init()">
     <h1>Hello from python server</h1>
+    <h2>My Bugs</h2>
+    <ul class="bug-list route hide"></ul>
+    <section class="bug-details hide route"></section>
+    <section class="bug-edit hide route"></section>
+    <script>
+        'use strict'
+
+        // Controller
+        async function init() {
+            const bugs = await getBugs()
+            renderBugs(bugs)
+        }
+
+        async function onRemoveBug(bugId) {
+            const bugs = await removeBug(bugId)
+            renderBugs(bugs)
+        }
+
+        async function onShowDetails(bugId) {
+            const bug = await getBugById(bugId)
+            renderDetails(bug)
+        }
+
+        async function onEditBug(bugId) {
+            const bug = await getBugById(bugId)
+            renderEdit(bug)
+        }
+
+        async function onSaveBug(ev, bugId) {
+            ev.preventDefault()
+            const [input1, input2] = ev.target
+
+            const bug = await getBugById(bugId)
+            bug.title = input1.value
+            bug.severity = input2.value
+
+            await saveBug(bug)
+            onShowDetails(bugId)
+        }
+
+        //View
+        function renderBugs(bugs) {
+            const strHtml = bugs.map(bug => {
+                return `
+                    <li class="bug-preview">
+                        <p>Title: ${bug.title}</p>
+                        <p>Severity: ${bug.severity}</p>
+                        <button onclick="onRemoveBug('${bug._id}')">Remove</button>
+                        <button onclick="onShowDetails('${bug._id}')">Details</button>
+                    </li>
+                `
+            }).join('')
+
+            document.querySelector('.bug-list').innerHTML = strHtml
+            routerView('list')
+        }
+
+        function renderDetails(bug) {
+            const strHtml = `
+                <p>Title: ${bug.title}</p>
+                <p>severity: ${bug.severity}</p>
+                <p>Date: ${bug.createdAt}</p>
+                <button onclick="routerView('list')">Back</button>
+                <button onclick="onEditBug('${bug._id}')">Edit</button>
+            `
+            document.querySelector('.bug-details').innerHTML = strHtml
+            routerView('details')
+        }
+
+        function renderEdit(bug) {
+            const strHtml = `
+                <form onsubmit="onSaveBug(event, '${bug._id}')">
+                    <input type="text" value="${bug.title}">
+                    <input type="number" value="${bug.severity}">
+                    <button>Save</button>
+                    <button onclick="routerView('details')">Back</button>
+                </form>
+            `
+            document.querySelector('.bug-edit').innerHTML = strHtml
+            routerView('edit')
+        }
+
+        function routerView(route) {
+            const routes = {
+                list: '.bug-list',
+                details: '.bug-details',
+                edit: '.bug-edit'
+            }
+            document.querySelectorAll('.route').forEach(node => {
+                node.classList.add('hide')
+            })
+            document.querySelector(routes[route]).classList.remove('hide')
+        }
+
+
+        // Service
+        const BASE_URL = 'http://127.0.0.1:3030'
+        function getBugs() {
+            return fetch(BASE_URL + '/api/bug')
+                .then(res => res.json())
+                .catch((err) => console.log('error getting bugs'))
+        }
+
+        function getBugById(bugId) {
+            return fetch(`${BASE_URL}/api/bug/${bugId}`)
+                .then(res => res.json())
+                .catch((err) => console.log('error getting by id'))
+        }
+
+        function removeBug(bugId) {
+            return fetch(`${BASE_URL}/api/bug/${bugId}`, { method: 'DELETE' })
+                .then(res => res.json())
+                .catch((err) => console.log('error removing bug'))
+        }
+
+        function saveBug(bug) {
+            const method = (bug._id) ? 'PUT' : 'POST'
+            const url = `${BASE_URL}/api/bug`
+            const body = JSON.stringify(bug)
+
+            return fetch(url, { method: method, body: body })
+                .then(res => res.json())
+                .catch((err) => console.log('error saving bug', err))
+        }
+
+    </script>
+    <style>
+        h1 {
+            color: pink;
+        }
+
+        ul {
+            list-style-type: none;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        .bug-list .bug-preview {
+            border: 1px solid lightgray;
+            width: 200px;
+            padding: 10px;
+            margin-block-end: 10px;
+        }
+    </style>
 </body>
 
 </html>
