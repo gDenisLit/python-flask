@@ -13,27 +13,36 @@ def index():
 
 @app.route("/api/bug", methods=["GET"])
 async def get_bugs():
-    bugs = await Bug_Service["query"]()
-    return jsonify(bugs)
+    try:
+        bugs = await Bug_Service["query"]()
+        return jsonify(bugs)
+    except Exception as e:
+        return jsonify({"message": f"Error creating bug: {e}"}), 500
 
 
 @app.route("/api/bug/<bug_id>", methods=["GET"])
 async def get_bug_by_id(bug_id):
-    bug = await Bug_Service["get_by_id"](bug_id)
-    return jsonify(bug)
+    try:
+        bug = await Bug_Service["get_by_id"](bug_id)
+        return jsonify(bug)
+    except Exception as e:
+        return jsonify({"message": f"Error creating bug: {e}"}), 500
 
 
 @app.route("/api/bug/<bug_id>", methods=["DELETE"])
 async def remove_bug(bug_id):
-    bugs = await Bug_Service["remove_bug"](bug_id)
-    return jsonify(bugs)
+    try:
+        bugs = await Bug_Service["remove_bug"](bug_id)
+        return jsonify(bugs)
+    except Exception as e:
+        return jsonify({"message": f"Error creating bug: {e}"}), 500
 
 
 @app.route("/api/bug", methods=["POST"])
 async def add_bug():
     try:
         bug_data = request.get_json()
-        bugs = await Bug_Service.add_bug(bug_data)
+        bugs = await Bug_Service["add_bug"](bug_data)
         return jsonify(bugs), 201
     except Exception as e:
         return jsonify({"message": f"Error creating bug: {e}"}), 500
@@ -43,9 +52,7 @@ async def add_bug():
 async def update_bug():
     try:
         bug_data = request.get_json()
-        print("bug data", bug_data)
-        bugs = await Bug_Service.update_bug(bug_data)
-        print(bugs)
+        bugs = await Bug_Service["update_bug"](bug_data)
         return jsonify(bugs), 201
     except Exception as e:
         return jsonify({"message": f"Error updating bug: {e}"}), 500

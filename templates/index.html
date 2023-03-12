@@ -11,6 +11,17 @@
 <body onload="init()">
     <h1>Hello from python server</h1>
     <h2>My Bugs</h2>
+    <form onsubmit="onAddBug(event)">
+        <label>
+            <span>Name:</span>
+            <input type="text" placeholder="Enter bug name">
+        </label>
+        <label>
+            <span>Severity:</span>
+            <input type="number">
+        </label>
+        <button type="submit">Add Bug</button>
+    </form>
     <ul class="bug-list route hide"></ul>
     <section class="bug-details hide route"></section>
     <section class="bug-edit hide route"></section>
@@ -38,6 +49,17 @@
             renderEdit(bug)
         }
 
+        async function onAddBug(ev) {
+            ev.preventDefault()
+            const [input1, input2] = ev.target
+            const bug = {
+                title: input1.value,
+                severity: input2.value
+            }
+            const bugs = await saveBug(bug)
+            renderBugs(bugs)
+        }
+
         async function onSaveBug(ev, bugId) {
             ev.preventDefault()
             const [input1, input2] = ev.target
@@ -52,6 +74,7 @@
 
         //View
         function renderBugs(bugs) {
+            bugs = bugs.reverse()
             const strHtml = bugs.map(bug => {
                 return `
                     <li class="bug-preview">
@@ -72,7 +95,7 @@
                 <p>Title: ${bug.title}</p>
                 <p>severity: ${bug.severity}</p>
                 <p>Date: ${bug.createdAt}</p>
-                <button onclick="routerView('list')">Back</button>
+                <button onclick="init()">Back</button>
                 <button onclick="onEditBug('${bug._id}')">Edit</button>
             `
             document.querySelector('.bug-details').innerHTML = strHtml
@@ -130,11 +153,16 @@
             const url = `${BASE_URL}/api/bug`
             const body = JSON.stringify(bug)
 
-            return fetch(url, { method: method, body: body })
+            return fetch(url, {
+                method: method,
+                body: body,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
                 .then(res => res.json())
                 .catch((err) => console.log('error saving bug', err))
         }
-
     </script>
     <style>
         h1 {
