@@ -1,7 +1,7 @@
-from service import Bug_Service
+from api.bug.service import Bug_Service
 
 
-async def get_bugs():
+async def query():
     try:
         bugs = await Bug_Service["query"]()
         return bugs
@@ -39,3 +39,12 @@ async def update_bug(bug_data):
         return bugs, 201
     except Exception as e:
         print({"message": f"Error creating bug: {e}"})
+
+
+Bug_Controller = {
+    "query": query,
+    "get_bug_by_id": get_bug_by_id,
+    "remove_bug": remove_bug,
+    "add_bug": add_bug,
+    "update_bug": update_bug,
+}
