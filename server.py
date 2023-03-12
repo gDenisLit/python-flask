@@ -1,6 +1,5 @@
-from flask import Flask, jsonify, request, send_file, render_template
-import os
-from services.bug_service import Bug_Service
+from flask import Flask, jsonify, request, render_template
+from api.bug.controller import get_bugs, get_bug_by_id, remove_bug, add_bug, update_bug
 
 app = Flask(__name__)
 app.static_folder = "public"
@@ -14,48 +13,48 @@ def index():
 @app.route("/api/bug", methods=["GET"])
 async def get_bugs():
     try:
-        bugs = await Bug_Service["query"]()
+        bugs = await get_bugs()
         return jsonify(bugs)
-    except Exception as e:
-        return jsonify({"message": f"Error creating bug: {e}"}), 500
+    except:
+        return jsonify({"message": f"Internal error"}), 500
 
 
 @app.route("/api/bug/<bug_id>", methods=["GET"])
 async def get_bug_by_id(bug_id):
     try:
-        bug = await Bug_Service["get_by_id"](bug_id)
+        bug = await get_bug_by_id(bug_id)
         return jsonify(bug)
-    except Exception as e:
-        return jsonify({"message": f"Error creating bug: {e}"}), 500
+    except:
+        return jsonify({"message": f"Internal error"}), 500
 
 
 @app.route("/api/bug/<bug_id>", methods=["DELETE"])
 async def remove_bug(bug_id):
     try:
-        bugs = await Bug_Service["remove_bug"](bug_id)
+        bugs = await remove_bug(bug_id)
         return jsonify(bugs)
-    except Exception as e:
-        return jsonify({"message": f"Error creating bug: {e}"}), 500
+    except:
+        return jsonify({"message": f"Internal error"}), 500
 
 
 @app.route("/api/bug", methods=["POST"])
 async def add_bug():
     try:
         bug_data = request.get_json()
-        bugs = await Bug_Service["add_bug"](bug_data)
+        bugs = await add_bug(bug_data)
         return jsonify(bugs), 201
-    except Exception as e:
-        return jsonify({"message": f"Error creating bug: {e}"}), 500
+    except:
+        return jsonify({"message": f"Internal error"}), 500
 
 
 @app.route("/api/bug", methods=["PUT"])
 async def update_bug():
     try:
         bug_data = request.get_json()
-        bugs = await Bug_Service["update_bug"](bug_data)
+        bugs = await update_bug(bug_data)
         return jsonify(bugs), 201
-    except Exception as e:
-        return jsonify({"message": f"Error updating bug: {e}"}), 500
+    except:
+        return jsonify({"message": f"Internal error"}), 500
 
 
 app.run(port=3030, debug=True)

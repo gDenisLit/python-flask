@@ -40,7 +40,7 @@ async def update_bug(new_bug):
             idx = i
             break
 
-    print('found idx', idx)
+    print("found idx", idx)
     if idx >= 0:
         bugs[idx] = new_bug
 
@@ -49,7 +49,7 @@ async def update_bug(new_bug):
 
 
 async def add_bug(new_bug):
-    print('new ', new_bug)
+    print("new ", new_bug)
     bug = create_bug(new_bug["title"], new_bug["severity"])
     bugs = await query()
     bugs.append(bug)
